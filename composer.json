@@ -1,0 +1,26 @@
+{
+    "name": "vayes/serializer",
+    "type": "library",
+    "description": "Serializer and normalizer utility.",
+    "keywords": [],
+    "homepage": "https://vayes.com.tr",
+    "license": "MIT",
+    "authors": [
+        {
+          "name": "Yahya Erturan",
+          "email": "yahya@erturan.com.tr"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symfony/options-resolver": "4.3.*",
+        "vayes/facade": "1.*",
+        "vayes/str": "1.*"
+    },
+    "autoload": {
+        "psr-4": { "Vayes\\Serializer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    }
+}
