@@ -59,7 +59,7 @@ class Normalizer
         {
             // Resolve protected properties
             $key = preg_replace('/\\x00\*\\x00/u', '', $k);
-            if ($key !== $k) {
+            if ((string) $key !== (string) $k) {
                 $protected[] = $key;
                 if (false === $this->options['includeProtectedProperties']) {
                     continue;
