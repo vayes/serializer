@@ -68,6 +68,13 @@ class Normalizer
 
             // Resolve private|public properties
             $key = preg_replace('/\\x00.*?\\x00/u', '', $key);
+            
+            // Normalize DateTime objects
+            if (true === $v instanceof \DateTimeInterface) {
+                $v->setTimezone(new \DateTimeZone('UTC'));
+                $v = $v->format("Y-m-d h:i:s");
+            }
+            
             $val = (is_array($v) || is_object($v)) ? $this->normalize($v) : $v;
 
             if (false === $this->options['includeNullValues']) {
