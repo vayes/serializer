@@ -7,6 +7,13 @@ use function Vayes\Inflector\slugify;
 
 class Normalizer
 {
+    const INCLUDE_PROTECTED_PROPERTIES = 'includeProtectedProperties';
+    const INCLUDE_NULL_VALUES = 'includeNullValues';
+    const PROPERTY_CALLBACK = 'propertyCallback';
+    const IGNORED_PROPERTIES = 'ignoredProperties';
+    const CONVERT_PROPERTIES_TO_SNAKE_CASE = 'convertPropertiesToSnakeCase';
+    const CASE_CONVERTER_FUNCTION = 'caseConverterFunction';
+
     /** @var array */
     protected $options = [];
 
@@ -61,7 +68,7 @@ class Normalizer
             $key = preg_replace('/\\x00\*\\x00/u', '', $k);
             if ((string) $key !== (string) $k) {
                 $protected[] = $key;
-                if (false === $this->options['includeProtectedProperties']) {
+                if (false === $this->options[self::INCLUDE_PROTECTED_PROPERTIES]) {
                     continue;
                 }
             }
@@ -77,15 +84,15 @@ class Normalizer
             
             $val = (is_array($v) || is_object($v)) ? $this->normalize($v) : $v;
 
-            if (false === $this->options['includeNullValues']) {
+            if (false === $this->options[self::INCLUDE_NULL_VALUES]) {
                 if (null === $val) {
                     continue;
                 }
             }
 
             // Handle case conversion of the property names
-            if (true === $this->options['convertPropertiesToSnakeCase']) {
-                $funcMetaArray = explode('|', $this->options['caseConverterFunction']);
+            if (true === $this->options[self::CONVERT_PROPERTIES_TO_SNAKE_CASE]) {
+                $funcMetaArray = explode('|', $this->options[self::CASE_CONVERTER_FUNCTION]);
                 $func = array_shift($funcMetaArray);
 
                 if (false === function_exists($func)) {
@@ -103,9 +110,9 @@ class Normalizer
 
             // String manipulation callbacks for keys. e.g. "str_replace|arg_2|arg_3"
             $cbPropertyOpt = 'callbackPropertyCallback';
-            if (false === is_null($this->options['propertyCallback'])) {
-                if (is_string($this->options['propertyCallback'])) {
-                    $cbArray = explode('|', $this->options['propertyCallback']);
+            if (false === is_null($this->options[self::PROPERTY_CALLBACK])) {
+                if (is_string($this->options[self::PROPERTY_CALLBACK])) {
+                    $cbArray = explode('|', $this->options[self::PROPERTY_CALLBACK]);
                     $cbFunc = array_shift($cbArray);
                     $key = call_user_func_array(
                         $cbFunc,
@@ -115,7 +122,7 @@ class Normalizer
                         )
                     );
                 } else {
-                    $cbFunc = $this->options['propertyCallback'];
+                    $cbFunc = $this->options[self::PROPERTY_CALLBACK];
                     $key = call_user_func_array(
                         $cbFunc,
                         [$key, $val]
@@ -130,9 +137,9 @@ class Normalizer
             $arr[$key] = $val;
 
             // Exclude given keys from normalized object. e.g. unset id fields
-            if (false === empty($this->options['ignoredProperties'])
-                && true === is_array($this->options['ignoredProperties'])) {
-                if (in_array($key, $this->options['ignoredProperties'])) {
+            if (false === empty($this->options[self::IGNORED_PROPERTIES])
+                && true === is_array($this->options[self::IGNORED_PROPERTIES])) {
+                if (in_array($key, $this->options[self::IGNORED_PROPERTIES])) {
                     unset($arr[$key]);
                 }
             }
@@ -151,19 +158,19 @@ class Normalizer
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'includeProtectedProperties' => false,
-            'includeNullValues' => false,
-            'propertyCallback' => null,
-            'ignoredProperties' => [],
-            'convertPropertiesToSnakeCase' => true,
-            'caseConverterFunction' => 'vayes\str\str_snake_case_safe|_',
+            self::INCLUDE_PROTECTED_PROPERTIES => false,
+            self::INCLUDE_NULL_VALUES => false,
+            self::PROPERTY_CALLBACK => null,
+            self::IGNORED_PROPERTIES => [],
+            self::CONVERT_PROPERTIES_TO_SNAKE_CASE => true,
+            self::CASE_CONVERTER_FUNCTION => 'vayes\str\str_snake_case_safe|_',
         ]);
 
-        $resolver->setAllowedTypes('includeProtectedProperties', 'bool');
-        $resolver->setAllowedTypes('includeNullValues', 'bool');
-        $resolver->setAllowedTypes('propertyCallback', ['null', 'string', 'Closure']);
-        $resolver->setAllowedTypes('ignoredProperties', 'string[]');
-        $resolver->setAllowedTypes('convertPropertiesToSnakeCase', 'bool');
-        $resolver->setAllowedTypes('caseConverterFunction', 'string');
+        $resolver->setAllowedTypes(self::INCLUDE_PROTECTED_PROPERTIES, 'bool');
+        $resolver->setAllowedTypes(self::INCLUDE_NULL_VALUES, 'bool');
+        $resolver->setAllowedTypes(self::PROPERTY_CALLBACK, ['null', 'string', 'Closure']);
+        $resolver->setAllowedTypes(self::IGNORED_PROPERTIES, 'string[]');
+        $resolver->setAllowedTypes(self::CONVERT_PROPERTIES_TO_SNAKE_CASE, 'bool');
+        $resolver->setAllowedTypes(self::CASE_CONVERTER_FUNCTION, 'string');
     }
 }
