@@ -13,6 +13,12 @@ class Normalizer
     const IGNORED_PROPERTIES = 'ignoredProperties';
     const CONVERT_PROPERTIES_TO_SNAKE_CASE = 'convertPropertiesToSnakeCase';
     const CASE_CONVERTER_FUNCTION = 'caseConverterFunction';
+    const IGNORE_SQL_BEHAVIOURAL_PROPERTIES = 'ignoreSqlBehaviouralProperties';
+    const SQL_BEHAVIOURAL_PROPERTIES =  [
+        'created_at', 'created_by',
+        'updated_at', 'updated_by',
+        'deleted_at', 'deleted_by'
+    ];
 
     /** @var array */
     protected $options = [];
@@ -26,6 +32,7 @@ class Normalizer
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
+        $this->handleSqlBehaviouralProperties($options);
         $this->options = $resolver->resolve($options);
     }
 
@@ -155,6 +162,23 @@ class Normalizer
         return (array) $arr;
     }
 
+    /**
+     * Adds optional sql behavioural properties to Ignore list
+     * @param array $options
+     */
+    protected function handleSqlBehaviouralProperties(array &$options)
+    {
+        if (false === empty($options[self::IGNORE_SQL_BEHAVIOURAL_PROPERTIES])) {
+            if (true === isset($options[self::IGNORED_PROPERTIES])) {
+                $options[self::IGNORED_PROPERTIES] = array_merge(
+                    $options[self::IGNORED_PROPERTIES], self::SQL_BEHAVIOURAL_PROPERTIES
+                );
+            } else {
+                $options[self::IGNORED_PROPERTIES] = self::SQL_BEHAVIOURAL_PROPERTIES;
+            }
+        }
+    }
+
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -164,6 +188,7 @@ class Normalizer
             self::IGNORED_PROPERTIES => [],
             self::CONVERT_PROPERTIES_TO_SNAKE_CASE => true,
             self::CASE_CONVERTER_FUNCTION => 'vayes\str\str_snake_case_safe|_',
+            self::IGNORE_SQL_BEHAVIOURAL_PROPERTIES => false
         ]);
 
         $resolver->setAllowedTypes(self::INCLUDE_PROTECTED_PROPERTIES, 'bool');
@@ -172,5 +197,6 @@ class Normalizer
         $resolver->setAllowedTypes(self::IGNORED_PROPERTIES, 'string[]');
         $resolver->setAllowedTypes(self::CONVERT_PROPERTIES_TO_SNAKE_CASE, 'bool');
         $resolver->setAllowedTypes(self::CASE_CONVERTER_FUNCTION, 'string');
+        $resolver->setAllowedTypes(self::IGNORE_SQL_BEHAVIOURAL_PROPERTIES, 'bool');
     }
 }
