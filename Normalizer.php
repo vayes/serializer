@@ -187,7 +187,7 @@ class Normalizer
             self::PROPERTY_CALLBACK => null,
             self::IGNORED_PROPERTIES => [],
             self::CONVERT_PROPERTIES_TO_SNAKE_CASE => true,
-            self::CASE_CONVERTER_FUNCTION => 'vayes\str\str_snake_case_safe|_',
+            self::CASE_CONVERTER_FUNCTION => 'vayes\str\str_snake_case_force|_',
             self::IGNORE_SQL_BEHAVIOURAL_PROPERTIES => false
         ]);
 
