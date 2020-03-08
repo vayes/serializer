@@ -106,13 +106,16 @@ class Normalizer
                     throw new \BadMethodCallException("Function with `{$func}` could not be found");
                 }
 
-                $key = call_user_func_array(
-                    $func,
-                    array_merge(
-                        (array) $key,
-                        $funcMetaArray
-                    )
-                );
+                // by pass case convertion if "|" found in key. Else, convert it.
+                if (false === stripos($key, "|")) {
+                    $key = call_user_func_array(
+                        $func,
+                        array_merge(
+                            (array) $key,
+                            $funcMetaArray
+                        )
+                    );
+                }
             }
 
             // String manipulation callbacks for keys. e.g. "str_replace|arg_2|arg_3"
