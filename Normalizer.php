@@ -186,7 +186,7 @@ class Normalizer
     {
         $resolver->setDefaults([
             self::INCLUDE_PROTECTED_PROPERTIES => false,
-            self::INCLUDE_NULL_VALUES => false,
+            self::INCLUDE_NULL_VALUES => true,
             self::PROPERTY_CALLBACK => null,
             self::IGNORED_PROPERTIES => [],
             self::CONVERT_PROPERTIES_TO_SNAKE_CASE => true,
